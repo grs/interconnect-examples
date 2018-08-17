@@ -1,0 +1,11 @@
+mkdir -p internal-certs
+
+# First we create the private key and self-signed certificate for the CA:
+openssl genrsa -out internal-certs/ca-key.pem 2048
+openssl req -new -batch -key internal-certs/ca-key.pem -out internal-certs/ca-csr.pem
+openssl x509 -req -in internal-certs/ca-csr.pem -signkey internal-certs/ca-key.pem -out internal-certs/ca.crt
+
+# Then we create a private key and certificate, signed by the CA for inter-router connections:
+openssl genrsa -out internal-certs/tls.key 2048
+openssl req -new -batch -subj "/O=io.enmasse/CN=amq-interconnect.myproject.svc.cluster.local" -key internal-certs/tls.key -out internal-certs/server-csr.pem
+openssl x509 -req -in internal-certs/server-csr.pem -CA internal-certs/ca.crt -CAkey internal-certs/ca-key.pem -out internal-certs/tls.crt -CAcreateserial
