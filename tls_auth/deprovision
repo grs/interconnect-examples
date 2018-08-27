@@ -1,3 +1,4 @@
 oc delete all,role,rolebinding,serviceaccount,configmap,serviceaccounts,rolebinding -l application=amq-interconnect
-oc delete secret inter-router-certs
+oc delete secret inter-router-certs client-ca
 rm -rf internal-certs
+rm -rf client-certs

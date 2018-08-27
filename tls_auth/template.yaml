@@ -23,6 +23,10 @@ parameters:
   description: Name of secret containing certificate with which to authenticate inter-router connections.
   name: INTER_ROUTER_CERTS_SECRET
   value: inter-router-certs
+- displayName: Client CA certificates
+  description: Name of secret containing CA certificate with which valid client certificates were signed.
+  name: CLIENT_CA_SECRET
+  value: client-ca
 - displayName: ImageStream Namespace
   description: Namespace in which the ImageStreams for Red Hat Middleware images are
     installed. These ImageStreams are normally installed in the openshift namespace.
@@ -39,8 +43,9 @@ parameters:
         id: Router.${HOSTNAME}
     }
 
+    # only allow anonymous connections over localhost
     listener {
-        host: 0.0.0.0
+        host: localhost
         port: amqp
         authenticatePeer: no
         saslMechanisms: ANONYMOUS
@@ -50,8 +55,9 @@ parameters:
         host: 0.0.0.0
         port: amqps
         sslProfile: service_tls
-        authenticatePeer: no
+        authenticatePeer: yes
         requireSsl: true
+        saslMechanisms: EXTERNAL
     }
 
     listener {
@@ -75,6 +81,7 @@ parameters:
         name: service_tls
         certFile: /etc/qpid-dispatch-certs/normal/tls.crt
         keyFile: /etc/qpid-dispatch-certs/normal/tls.key
+        caCertFile: /etc/qpid-dispatch-certs/client-ca/ca.crt
     }
 
     listener {
@@ -210,15 +217,18 @@ objects:
           - name: inter-router-certs
             readOnly: true
             mountPath: /etc/qpid-dispatch-certs/inter-router/
+          - name: client-ca
+            readOnly: true
+            mountPath: /etc/qpid-dispatch-certs/client-ca/
           - name: config-volume
             mountPath: /etc/qpid-dispatch/
           terminationGracePeriodSeconds: 60
           readinessProbe:
             tcpSocket:
-              port: 5672
+              port: 5671
           livenessProbe:
             tcpSocket:
-              port: 5672
+              port: 5671
         volumes:
         - name: certs
           secret:
@@ -226,6 +236,9 @@ objects:
         - name: inter-router-certs
           secret:
             secretName: ${INTER_ROUTER_CERTS_SECRET}
+        - name: client-ca
+          secret:
+            secretName: ${CLIENT_CA_SECRET}
         - name: config-volume
           configMap:
             name: ${APPLICATION_NAME}
@@ -255,3 +268,17 @@ objects:
       application: ${APPLICATION_NAME}
   data:
     qdrouterd.conf: ${QDROUTERD_CONF}
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: ${APPLICATION_NAME}
+    labels:
+      application: ${APPLICATION_NAME}
+  spec:
+    port:
+      targetPort: amqps
+    tls:
+      termination: passthrough
+    to:
+      kind: Service
+      name: amq-interconnect

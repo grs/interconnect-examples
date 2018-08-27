@@ -1,0 +1,11 @@
+mkdir -p client-certs
+
+# First we create the private key and self-signed certificate for the CA:
+openssl genrsa -out client-certs/ca-key.pem 2048
+openssl req -new -batch -key client-certs/ca-key.pem -out client-certs/ca-csr.pem
+openssl x509 -req -in client-certs/ca-csr.pem -signkey client-certs/ca-key.pem -out client-certs/ca.crt
+
+# Then we create a private key and certificate, signed by the CA for client connections:
+openssl genrsa -out client-certs/tls.key 2048
+openssl req -new -batch -subj "/CN=myclient" -key client-certs/tls.key -out client-certs/client-csr.pem
+openssl x509 -req -in client-certs/client-csr.pem -CA client-certs/ca.crt -CAkey client-certs/ca-key.pem -out client-certs/tls.crt -CAcreateserial

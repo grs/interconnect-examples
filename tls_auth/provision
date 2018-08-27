@@ -1,7 +1,14 @@
-./generate_certs
+# Generate certificates for securing inter-router connections:
+./generate_router_certs
 
 # Then create a secret with the private key, the router cert and the CA cert:
 oc create secret generic inter-router-certs --from-file=tls.crt=internal-certs/tls.crt  --from-file=tls.key=internal-certs/tls.key  --from-file=ca.crt=internal-certs/ca.crt
+
+# Generate certificates for securing client connections:
+./generate_client_certs
+
+# Then create a secret with the CA cert used to sign client certificate:
+oc create secret generic client-ca --from-file=ca.crt=client-certs/ca.crt
 
 # Then use the template to deploy the routers:
 # oc process -f template.yaml IMAGE_STREAM_NAMESPACE=$(oc project -q) | oc create -f -
