@@ -1,0 +1,4 @@
+oc delete all,role,rolebinding,serviceaccount,configmap,serviceaccounts,rolebinding -l application=amq-interconnect
+oc delete secret inter-router-certs
+rm -rf internal-certs
+rm -f qdrouterd.sasldb

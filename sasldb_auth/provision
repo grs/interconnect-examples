@@ -1,0 +1,14 @@
+./generate_certs
+
+# Then create a secret with the private key, the router cert and the CA cert:
+oc create secret generic inter-router-certs --from-file=tls.crt=internal-certs/tls.crt  --from-file=tls.key=internal-certs/tls.key  --from-file=ca.crt=internal-certs/ca.crt
+
+# Create a sasldb file with user information within it, e.g.:
+echo guest | saslpasswd2 -c -p -u interconnect guest -f ./qdrouterd.sasldb
+# Then create/update a secret containing that db:
+oc create secret generic sasldb --from-file=./qdrouterd.sasldb --dry-run=true -o yaml | oc apply -f -
+
+# Then use the template to deploy the routers:
+# oc process -f template.yaml IMAGE_STREAM_NAMESPACE=$(oc project -q) | oc create -f -
+oc process -f template.yaml | oc create -f -
+
