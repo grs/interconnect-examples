@@ -152,7 +152,7 @@ objects:
       spec:
         containers:
         - name: router
-          image: amq-interconnect-12-openshift:latest
+          image: amq-interconnect/amq-interconnect-1.2-openshift:latest
           env:
           - name: APPLICATION_NAME
             value: "${APPLICATION_NAME}"

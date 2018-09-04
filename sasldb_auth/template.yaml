@@ -1,16 +1,20 @@
 kind: Template
 apiVersion: v1
 metadata:
-  name: amq-interconnect-1-tls-auth
+  name: amq-interconnect-1-sasl-auth
   annotations:
-    description: Application template for Red Hat Interconnect Router with TLS.
+    description: Application template for Red Hat Interconnect Router
+        with SASL authentication. This template requires a secret
+        holding a sasldb against which clients will be authenticated
+        and a secret holding the certs and key required for
+        inter-router authentication and encryption.
     iconClass: icon-amq
     openshift.io/provider-display-name: Red Hat, Inc.
     tags: messaging,amq
     version: 1.4.10
-    openshift.io/display-name: Red Hat Interconnect Router 1.x
+    openshift.io/display-name: Red Hat Interconnect Router 1.x with SASL
 labels:
-  template: amq-interconnect-1-basic
+  template: amq-interconnect-1-sasl-auth
   xpaas: 1.4.10
 message: A new messaging service has been created in your project.
 parameters:
@@ -222,10 +226,10 @@ objects:
           terminationGracePeriodSeconds: 60
           readinessProbe:
             tcpSocket:
-              port: 5672
+              port: 8672
           livenessProbe:
             tcpSocket:
-              port: 5672
+              port: 8672
         volumes:
         - name: certs
           secret:

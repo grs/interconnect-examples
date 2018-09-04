@@ -16,3 +16,4 @@ oc create secret generic inter-router-certs --from-file=tls.crt=internal-certs/t
 # Then use the template to deploy the routers:
 oc process -f template.yaml IMAGE_STREAM_NAMESPACE=$(oc project -q) | oc create -f -
 
+oc scale statefulset amq-interconnect --replicas=2
