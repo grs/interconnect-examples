@@ -7,7 +7,7 @@ metadata:
     iconClass: icon-amq
     openshift.io/provider-display-name: Red Hat, Inc.
     tags: messaging,amq
-    openshift.io/display-name: Red Hat Interconnect Router 1.x
+    openshift.io/display-name: Red Hat AMQ Interconnect Router 1.x
 labels:
   template: amq-interconnect-inferred-mesh
 message: A new router service has been created in your project.

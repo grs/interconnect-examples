@@ -12,7 +12,7 @@ metadata:
     openshift.io/provider-display-name: Red Hat, Inc.
     tags: messaging,amq
     version: 1.4.10
-    openshift.io/display-name: Red Hat Interconnect Router 1.x with SASL
+    openshift.io/display-name: Red Hat AMQ Interconnect Router 1.x with SASL
 labels:
   template: amq-interconnect-1-sasl-auth
   xpaas: 1.4.10
